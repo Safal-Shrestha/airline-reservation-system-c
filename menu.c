@@ -13,6 +13,7 @@ typedef struct{
     char favFood[40];
     char birthPlace[40];
     unsigned long long int contactNo;
+    int loginMode;
 }userDetails;
 
 
@@ -47,6 +48,7 @@ void signup()
 {	
 	system("cls");
 	userDetails newUser, *database;
+	char adminPassword[40];
 	int no=1, readLoop=0, newSize=1; //variable for reading data from database
 	
 	FILE *fp;
@@ -54,6 +56,20 @@ void signup()
     
     fflush(stdin);
     printf("SIGN UP\n");
+    printf("Admin(1)/Client(0): ");
+    scanf("&d",&newUser.loginMode);
+    fflush(stdin);
+    if(newUser.loginMode==1)
+    {
+    	adminPasswordError:
+    	printf("Admin Password: ");
+    	fgets(adminPassword,sizeof(adminPassword),stdin);
+    	if(strcmp(adminPassword, "adminpassword")!=0)
+    	{
+    		printf("Unauthorised");
+    		goto adminPasswordError;
+		}
+	}
     printf("Name: ");
     fgets(newUser.name,40,stdin);
     printf("User Name: ");
