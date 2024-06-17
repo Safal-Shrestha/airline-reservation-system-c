@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include"envVariable.h"
 
 void signup();
 void login();
@@ -47,6 +48,9 @@ int main()
 void signup()
 {	
 	system("cls");
+	const char key[] = "ADMIN_PASSWORD";
+    char *adminPassValue = get_env_variable(key);
+	
 	userDetails newUser, *database;
 	char adminPassword[40];
 	int no=1, readLoop=0, newSize=1; //variable for reading data from database
@@ -57,14 +61,15 @@ void signup()
     fflush(stdin);
     printf("SIGN UP\n");
     printf("Admin(1)/Client(0): ");
-    scanf("&d",&newUser.loginMode);
+    scanf("%d",&newUser.loginMode);
     fflush(stdin);
     if(newUser.loginMode==1)
     {
     	adminPasswordError:
     	printf("Admin Password: ");
     	fgets(adminPassword,sizeof(adminPassword),stdin);
-    	if(strcmp(adminPassword, "adminpassword")!=0)
+    	adminPassword[strcspn(adminPassword, "\n")] = '\0';//removing trailing newline character
+    	if(strcmp(adminPassword, adminPassValue)!=0)
     	{
     		printf("Unauthorised");
     		goto adminPasswordError;
