@@ -186,7 +186,14 @@ void login(){
 		if(strcmp(loginDetails.uName,database[i].uName)==0&&strcmp(loginDetails.pw,database[i].pw)==0)
 		{
 			loginDetails=database[i];
-			printf("Logged In");
+			if(loginDetails.loginMode==1)
+			{
+				system("admin");
+			}
+			else
+			{
+				system("client");
+			}
 			loginCheck=1;
 		}
 	}
