@@ -1,11 +1,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<conio.h>
 #include"envVariable.h"
 
 void signup();
 void login();
 void forgotPassword(char *);
+void getPasswordSecurely(char *);
 
 typedef struct{
     char name[40];
@@ -22,7 +24,7 @@ int main()
 {
 	int menuChoice;
 	menuErr:
-	printf("MENU\n1.Sign Up\n2. Log In\n3. Exit");
+	printf("MENU\n1. Sign Up\n2. Log In\n3. Exit");
 	printf("\nEnter Choice: ");
 	scanf("%d", &menuChoice);
 	
@@ -48,11 +50,14 @@ int main()
 void signup()
 {	
 	system("cls");
-	const char key[] = "ADMIN_PASSWORD";
-    char *adminPassValue = get_env_variable(key);
+	
+	int validatePhoneNumber(int);
+	
+	const char adminPass[] = "ADMIN_PASSWORD";
+    char *adminPassValue = get_env_variable(adminPass);
 	
 	userDetails newUser, *database;
-	char adminPassword[40];
+    char passwordConfirm[40], adminPassword[40];
 	int no=1, readLoop=0, newSize=1; //variable for reading data from database
 	
 	FILE *fp;
@@ -67,7 +72,8 @@ void signup()
     {
     	adminPasswordError:
     	printf("Admin Password: ");
-    	fgets(adminPassword,sizeof(adminPassword),stdin);
+    	getPasswordSecurely(adminPassword);
+    	fflush(stdin);
     	adminPassword[strcspn(adminPassword, "\n")] = '\0';//removing trailing newline character
     	if(strcmp(adminPassword, adminPassValue)!=0)
     	{
@@ -79,10 +85,26 @@ void signup()
     fgets(newUser.name,40,stdin);
     printf("User Name: ");
     fgets(newUser.uName,40,stdin);
+    passwordEnter:
     printf("Password: ");
-    fgets(newUser.pw,40,stdin);
+    getPasswordSecurely(newUser.pw);
+    fflush(stdin);
+    printf("Re-Enter Password: ");
+    getPasswordSecurely(passwordConfirm);
+    fflush(stdin);
+    if(strcmp(newUser.pw,passwordConfirm)!=0)
+    {
+    	printf("Password does not match\n");
+    	goto passwordEnter;
+	}
+    invalidPhone:
     printf("Phone Number: ");
     scanf("%lld",&newUser.contactNo);
+    if(validatePhoneNumber(newUser.contactNo)!=10)
+    {
+    	printf("Invalid Phone Number\n");
+    	goto invalidPhone;
+	}
     fflush(stdin);
     printf("\nSecurity Questions:\n");
     printf("What is Your Favorite Food?\n");
@@ -133,10 +155,11 @@ void login(){
 	printf("User Name: ");
 	fgets(loginDetails.uName,40,stdin);
 	printf("Password: ");
-	fgets(loginDetails.pw,40,stdin);
+	getPasswordSecurely(loginDetails.pw);
+	fflush(stdin);
 	if(loginTry!=0)
 	{
-		printf("Forgot Password? (Y/N): ");
+		printf("\nForgot Password? (Y/N): ");
 		scanf("%c", &forgotPasswordChoice);
 		if(forgotPasswordChoice=='y'||forgotPasswordChoice=='Y')
 		{
@@ -146,6 +169,7 @@ void login(){
 			fptr=fopen("database.txt","ab+");
 			goto loginError;
 		}
+		goto loginError;
 	}
 	
 	rewind(fptr);
@@ -222,4 +246,43 @@ void forgotPassword(char *uname)
 		fwrite((database+i),sizeof(userDetails),1,fp);
 	}
 	fclose(fp);
+}
+
+int validatePhoneNumber(int number){
+	int temp=number, digits=0;
+	while(temp!=0)
+	{
+		digits++;
+		temp=temp/10;
+	}
+	return digits;
+}
+
+void getPasswordSecurely(char *password)
+{
+	int p=0;
+	do{
+		char ch=getch();
+		
+		if(ch==13)
+		{
+			break;
+		}
+		else if(ch ==8)
+		{
+			if(p>0)
+			{
+				p--;
+				printf("\b \b");
+			}
+		}
+		else
+		{
+			password[p]=ch;
+			p++;
+			printf("*");
+		}
+	}while(1);
+	password[p]='\0';
+	printf("\n");
 }
