@@ -3,25 +3,16 @@
 #include<string.h>
 #include<conio.h>
 #include"envVariable.h"
+#include"basestructures.h"
 
 void signup();
 void login();
 void forgotPassword(char *);
 void getPasswordSecurely(char *);
 
-typedef struct{
-    char name[40];
-    char uName[40];
-    char pw[40];
-    char favFood[40];
-    char birthPlace[40];
-    unsigned long long int contactNo;
-    int loginMode;
-}userDetails;
-
-
 int main()
 {
+	system("cls");
 	int menuChoice;
 	menuErr:
 	printf("MENU\n1. Sign Up\n2. Log In\n3. Exit");
@@ -78,9 +69,13 @@ void signup()
     	adminPassword[strcspn(adminPassword, "\n")] = '\0';//removing trailing newline character
     	if(strcmp(adminPassword, adminPassValue)!=0)
     	{
-    		printf("Unauthorised");
+    		printf("Unauthorised\n");
     		goto adminPasswordError;
 		}
+	}
+	if(newUser.loginMode!=1)
+	{
+		newUser.loginMode=0;
 	}
     printf("Name: ");
     fgets(newUser.name,40,stdin);
@@ -175,6 +170,7 @@ void login(){
 			FILE *loginUser;
 			loginUser=fopen("activeUser.txt","wb");
 			fwrite(&loginDetails,sizeof(loginDetails),1,loginUser);
+			fclose(loginUser);
 			if(loginDetails.loginMode==1)
 			{
 				system("admin");
