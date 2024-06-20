@@ -32,6 +32,7 @@ int main()
 	{
 		case 1:
 			signup();
+			goto menuErr;
 			break;
 			
 		case 2:
@@ -148,7 +149,6 @@ void login(){
 	fptr=fopen("database.txt","ab+");
 	
 	printf("LOG IN\n");
-	fflush(stdin);
 	
 	loginError:
 	fflush(stdin);
@@ -157,20 +157,6 @@ void login(){
 	printf("Password: ");
 	getPasswordSecurely(loginDetails.pw);
 	fflush(stdin);
-	if(loginTry!=0)
-	{
-		printf("\nForgot Password? (Y/N): ");
-		scanf("%c", &forgotPasswordChoice);
-		if(forgotPasswordChoice=='y'||forgotPasswordChoice=='Y')
-		{
-			forgotPassword(loginDetails.uName);
-			loginTry=0;
-			fclose(fptr);
-			fptr=fopen("database.txt","ab+");
-			goto loginError;
-		}
-		goto loginError;
-	}
 	
 	rewind(fptr);
 	database=(userDetails *)calloc(no,sizeof(userDetails));
@@ -186,6 +172,9 @@ void login(){
 		if(strcmp(loginDetails.uName,database[i].uName)==0&&strcmp(loginDetails.pw,database[i].pw)==0)
 		{
 			loginDetails=database[i];
+			FILE *loginUser;
+			loginUser=fopen("activeUser.txt","wb");
+			fwrite(&loginDetails,sizeof(loginDetails),1,loginUser);
 			if(loginDetails.loginMode==1)
 			{
 				system("admin");
@@ -200,8 +189,27 @@ void login(){
 	
 	if(loginCheck==0)
 	{
-		printf("\nIncorrect Username or Password.\n");
+		printf("Incorrect Username or Password.\n\n");
 		loginTry++;
+		if(loginTry<2)
+		{
+			goto loginError;
+		}
+	}
+//	printf("Debug %d",loginCheck);
+	
+	if(loginTry!=0&&loginCheck==0)
+	{
+		printf("Forgot Password? (Y/N): ");
+		scanf("%c", &forgotPasswordChoice);
+		if(forgotPasswordChoice=='y'||forgotPasswordChoice=='Y')
+		{
+			forgotPassword(loginDetails.uName);
+			loginTry=0;
+			fclose(fptr);
+			fptr=fopen("database.txt","ab+");
+			goto loginError;
+		}
 		goto loginError;
 	}
 }

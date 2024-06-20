@@ -56,3 +56,4 @@ dkms.conf
 
 # Database File
 database.txt
+activeUser.txt
