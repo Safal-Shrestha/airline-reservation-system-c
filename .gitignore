@@ -55,5 +55,4 @@ dkms.conf
 *.env
 
 # Database File
-database.txt
-activeUser.txt
+*.txt

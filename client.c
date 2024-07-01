@@ -17,4 +17,5 @@ int main()
 	}
 	
 	printf("client");
+	getc(stdin);
 }
