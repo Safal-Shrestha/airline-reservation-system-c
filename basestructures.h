@@ -41,9 +41,9 @@ typedef struct{
 
 void initialiseSeats(int seatRow, int seatCol, int ***seatAvailability)
 {
-	*seatAvailability=(int **)malloc(seatRow*sizeof(int *));
+	*seatAvailability=(int **)calloc(seatRow,sizeof(int *));
 	for(int i=0;i<seatRow;i++)
 	{
-		(*seatAvailability)[i]=(int *)malloc(seatCol*sizeof(int));
+		(*seatAvailability)[i]=(int *)calloc(seatCol,sizeof(int));
 	}
 }

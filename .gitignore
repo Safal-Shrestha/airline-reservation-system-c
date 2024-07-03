@@ -56,3 +56,6 @@ dkms.conf
 
 # Database File
 *.txt
+
+# Excel Sheets
+*.xlsx

@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include"envVariable.h"
 #include"basestructures.h"
 
@@ -11,7 +12,6 @@ void insertFlightDetails(flightDetails *);
 
 int main()
 {
-	
 	int choice;
 	
 	FILE *activeUser;
@@ -27,9 +27,10 @@ int main()
 	menuErr:
 	system("cls");
 	printf("Menu\n");
-	printf("1. Check Flight Details\n2. Add/Edit Flight\n3. Delete Flight\n4. Add Airplane\n5. Delete Airplane");
+	printf("1. Check Flight Details\n2. Add/Edit Flight\n3. Delete Flight\n4. Add Airplane\n5. Delete Airplane\n6. Logout");
 	printf("\nEnter Choice: ");
 	scanf("%d",&choice);
+	fflush(stdin);
 	
 	system("cls");
 	switch(choice)
@@ -59,15 +60,80 @@ int main()
 			goto menuErr;
 			break;
 			
+		case 6:
+			fclose(activeUser);
+			activeUser=fopen("activeUser.txt","wb");
+			fclose(activeUser);
+			system("menu");
+			break;
+			
 		default:
 			printf("Out of Scope");
 			goto menuErr;
 	}
+	fclose(activeUser);
 }
 
 void currentFlightDetails()
 {
+	airplane detail;
+	flightDetails *flightDatabase;
 	
+	FILE *flight,*craftList;
+	craftList=fopen("aircraftList.txt","ab+");
+	flight=fopen("operatingFlight.txt","rb");
+	
+	int no=1, readLoop=0, newSize=1; //variable for reading data from flight details database
+	rewind(flight);
+	flightDatabase=(flightDetails *)calloc(no,sizeof(flightDetails));
+	while(fread((flightDatabase+readLoop), sizeof(flightDetails),1,flight)==1)
+	{
+		newSize++;
+		flightDatabase=(flightDetails *)realloc(flightDatabase, (newSize)*sizeof(flightDetails));
+		readLoop++;
+	}
+	if(newSize==1)
+	{
+		printf("No Available Data for Operating Flights.");
+		getc(stdin);
+	}
+	else
+	{
+		printf("OPERATING FLIGHTS\n");
+		for(int i=0;i<newSize-1;i++)
+		{
+			printf("%d.\nAircraft: %sAirlines: %s\n",i+1,flightDatabase[i].name,flightDatabase[i].airline);
+		}
+		int flightChoice;
+		printf("Check Available Seats of: ");
+		scanf("%d", &flightChoice);
+		flightChoice=flightChoice-1;
+		system("cls");
+		printf("Flight Details\n");
+		printf("Aircraft: %s",flightDatabase[flightChoice].name);
+		printf("Airlines: %s",flightDatabase[flightChoice].airline);
+		printf("Departure: %s",flightDatabase[flightChoice].departure);
+		printf("Destination: %s",flightDatabase[flightChoice].destination);
+		printf("Flight Duration: %d hrs %d min %d sec\n",flightDatabase[flightChoice].flightDuration.hour,flightDatabase[flightChoice].flightDuration.minute,flightDatabase[flightChoice].flightDuration.sec);
+		printf("Departure Time (dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[flightChoice].departureTime.day,flightDatabase[flightChoice].departureTime.month,flightDatabase[flightChoice].departureTime.year,flightDatabase[flightChoice].departureTime.hour,flightDatabase[flightChoice].departureTime.minute,flightDatabase[flightChoice].departureTime.sec);
+		printf("Arrival Time(dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[flightChoice].arrivalTime.day,flightDatabase[flightChoice].arrivalTime.month,flightDatabase[flightChoice].arrivalTime.year,flightDatabase[flightChoice].arrivalTime.hour,flightDatabase[flightChoice].arrivalTime.minute,flightDatabase[flightChoice].arrivalTime.sec);
+		printf("Ticket Price: %.2f\n",flightDatabase[flightChoice].ticketPrice);
+		printf("\nSeats\n");
+		rewind(craftList);
+
+		for(int i=0;i<=flightChoice;i++)
+		{
+			fread(&detail,sizeof(airplane),1,craftList);
+		}
+		initialiseSeats(detail.seatRow, detail.seatCol, &flightDatabase[flightChoice].seatAvailability);
+		printf("%d\n",flightDatabase[flightChoice].seatAvailability[0][0]);
+		printf("%s",detail.name);
+		
+		fclose(craftList);
+		fclose(flight);
+		fflush(stdin);
+		getc(stdin);
+	}
 }
 
 void addFlight()
@@ -113,10 +179,12 @@ void addFlight()
 				strcpy(info.airline,craftDatabase[i].airline);
 				fflush(stdin);
 				insertFlightDetails(&info);
+				fclose(flight);
+				flight=fopen("operatingFlight.txt","ab+");
 				fwrite(&info,sizeof(flightDetails),1,flight);
 				fclose(craftList);
 				craftList=fopen("aircraftList.txt","wb");
-				for(int i=0;i<c_newSize;i++)
+				for(int i=0;i<c_newSize-1;i++)
 				{		
 					fwrite((craftDatabase+i),sizeof(airplane),1,craftList);
 				}
@@ -158,15 +226,13 @@ void addFlight()
 						flightDatabase[i]=info;
 						fclose(flight);
 						flight=fopen("operatingFlight.txt","wb");
-						for(int i=0;i<f_newSize;i++)
+						for(int i=0;i<f_newSize-1;i++)
 						{		
 							fwrite((flightDatabase+i),sizeof(flightDetails),1,flight);
 						}
 						fclose(flight);
 					}
-				}
-				else
-					printf("Anda");
+				};
 				getc(stdin);
 			}
 		}
