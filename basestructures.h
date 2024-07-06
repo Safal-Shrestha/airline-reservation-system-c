@@ -27,7 +27,6 @@ typedef struct{
 }timeDetails;
 
 typedef struct{
-	int **seatAvailability;
 	char name[100];
 	char airline[100];
 	char departure[100];
@@ -36,6 +35,8 @@ typedef struct{
 	timeDetails departureTime;
 	timeDetails arrivalTime;
 	float ticketPrice;
+	int seatRow, seatCol;
+	int **seatAvailability;
 }flightDetails;
 
 
