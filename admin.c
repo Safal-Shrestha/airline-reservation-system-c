@@ -149,12 +149,17 @@ void currentFlightDetails()
 			}
 			printf("\n\n");
 		}
-
-		rewind(flight);
-
-		free(flightDatabase);
-		fclose(flight);
 	}
+	for(int j=0;j<totalOperatingFlights;j++)
+	{
+		for(int k=0;k<flightDatabase[j].seatRow;k++)
+		{
+			free(flightDatabase[j].seatAvailability[k]);
+		}
+		free(flightDatabase[j].seatAvailability);
+	}
+	fclose(flight);
+	free(flightDatabase);
 	fflush(stdin);
 	getc(stdin);
 }
@@ -220,6 +225,12 @@ void addFlight()
 				{		
 					fwrite((craftDatabase+i),sizeof(airplane),1,craftList);
 				}
+				
+				for(int i=0;i<info.seatRow;i++)
+				{
+					free(info.seatAvailability[i]);
+				}
+				free(info.seatAvailability);
 				fclose(craftList);
 				fclose(flight);	
 				printf("Press Enter to Continue");
@@ -287,11 +298,18 @@ void addFlight()
 									}
 								}
 							}
-							fclose(flight);
 						}
 					}	
 				}
 				getc(stdin);
+				for(int l=0;l<totalOperatingFlights;l++)
+				{
+					for(int m=0;m<flightDatabase[l].seatRow;m++)
+					{
+						free(flightDatabase[l].seatAvailability[m]);
+					}
+					free(flightDatabase[l].seatAvailability);
+				}
 			}
 		}
 	}
@@ -303,6 +321,8 @@ void addFlight()
 		goto craftErr;
 	}
 	
+	free(craftDatabase);
+	free(flightDatabase);
 	fclose(flight);
 	fclose(craftList);
 }
@@ -410,8 +430,6 @@ void deleteFlight()
 				fwrite((craftDatabase+i),sizeof(airplane),1,craftList);
 			}
 			
-			fclose(flight);
-			fclose(craftList);
 			fflush(stdin);
 		}
 		else
@@ -419,26 +437,44 @@ void deleteFlight()
 			system("cls");
 			goto flights;
 		}
-		
-
-		rewind(flight);
-
-		free(flightDatabase);
-		fclose(flight);
 	}
+	for(int j=0;j<totalOperatingFlights;j++)
+	{
+		initialiseSeats(flightDatabase[j].seatRow,flightDatabase[j].seatCol,&flightDatabase[j].seatAvailability);
+		for(int k=0;k<flightDatabase[j].seatRow;k++)
+		{
+			free(flightDatabase[j].seatAvailability[k]);
+		}
+		free(flightDatabase[j].seatAvailability);
+	}
+	free(craftDatabase);
+	free(flightDatabase);
+	fclose(craftList);
+	fclose(flight);
 	fflush(stdin);
 	getc(stdin);
 }
 
 void addAirplane()
 {
-	fflush(stdin);
 	
-	airplane details;
+	airplane details, *craftDatabase;
 	
 	FILE *plane;
 	plane=fopen("aircraftList.txt","ab+");
+	rewind(plane);
+	int c_no=1, c_readLoop=0, c_newSize=1; //variable for reading data from aircraft details database
+	craftDatabase=(airplane *)calloc(c_no,sizeof(airplane));
+	while(fread((craftDatabase+c_readLoop), sizeof(airplane),1,plane)==1)
+	{
+		c_newSize++;
+		craftDatabase=(airplane *)realloc(craftDatabase, (c_newSize)*sizeof(airplane));
+		c_readLoop++;
+	}
 	
+	duplicate:
+	fflush(stdin);
+	system("cls");
 	printf("NEW AIRPLANE ENTRY\n");
 	printf("Name: ");
 	fgets(details.name,100,stdin);
@@ -449,7 +485,25 @@ void addAirplane()
 	printf("Available Columns: ");
 	scanf("%d",&details.seatCol);
 	details.flightAvailability=1;
+	for(int i=0;i<c_readLoop;i++)
+	{
+		if(strcmp(details.name,craftDatabase[i].name)==0&&strcmp(details.airline,craftDatabase[i].airline)==0)
+		{
+			printf(RED "Aircraft Already Exists!!\n" reset);
+			printf("Add New?(y/n): ");
+			fflush(stdin);
+			if(getc(stdin)=='y')
+			{
+				goto duplicate;
+			}
+			else
+			{
+				goto leave;
+			}
+		}
+	}
 	fwrite(&details,sizeof(airplane),1,plane);
+	leave:
 	fclose(plane);
 }
 
@@ -555,13 +609,19 @@ void deleteAirplane()
 			system("cls");
 			goto flights;
 		}
-		
-
-		rewind(flight);
-
-		free(flightDatabase);
-		fclose(flight);
 	}
+	for(int j=0;j<totalOperatingFlights;j++)
+	{
+		for(int k=0;k<flightDatabase[j].seatRow;k++)
+		{
+			free(flightDatabase[j].seatAvailability[k]);
+		}
+		free(flightDatabase[j].seatAvailability);
+	}
+	free(craftDatabase);
+	free(flightDatabase);
+	fclose(flight);
+	fclose(craftList);
 	fflush(stdin);
 	getc(stdin);
 }

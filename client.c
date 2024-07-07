@@ -7,9 +7,7 @@ void bookedFlight();
 void cancelFlight();
 
 int main()
-{
-	system("cls");
-	
+{	
 	FILE *activeUser;
 	activeUser=fopen("activeUser.txt","rb");
 	userDetails currentUser;
@@ -31,12 +29,17 @@ int main()
 	switch(choice)
 	{
 		case 1:
+			bookFlights();
+			goto menuErr;
 			break;
 		
 		case 2:
+			bookedFlights();
+			goto menuErr;
 			break;
 		
 		case 3:
+			cancelFlight();
 			break;
 			
 		case 4:
@@ -50,5 +53,20 @@ int main()
 			printf("Out of Scope");
 			goto menuErr;
 	}
+	getc(stdin);
+}
+
+bookFlights()
+{
+	getc(stdin);
+}
+
+bookedFlights()
+{
+	getc(stdin);
+}
+
+cancelFlight()
+{
 	getc(stdin);
 }
