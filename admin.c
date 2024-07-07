@@ -89,62 +89,52 @@ void currentFlightDetails()
 	}
 	rewind(flight);
 	flightDatabase=(flightDetails *)malloc(totalOperatingFlights*sizeof(flightDetails));
-	
-	for(int i=0;i<totalOperatingFlights;i++)
+	for(int j=0;j<totalOperatingFlights;j++)
 	{
-//		fread((flightDatabase+i),sizeof(flightDetails)-sizeof(int **),1,flight);
-//		printf("%d",flightDatabase[i].seatRow);
-//		initialiseSeats(flightDatabase[i].seatRow,flightDatabase[i].seatCol,&flightDatabase[i].seatAvailability);
-//		printf("%d",flightDatabase[i].seatAvailability[0][0]);
-//		for(int j=0;j<flightDatabase[i].seatRow;j++)
-//		{
-//			for(int k=0;k<flightDatabase[i].seatCol;k++)
-//			{
-//				fread(&flightDatabase[i].seatAvailability[j][k],sizeof(int),1,flight);
-//			}
-//		}
-		fread((flightDatabase+i),sizeof(flightDetails),1,flight);
-		printf("%d\n",flightDatabase[i].seatRow);
+		fread((flightDatabase+j),sizeof(flightDetails)-sizeof(int **),1,flight);
+		initialiseSeats(flightDatabase[j].seatRow,flightDatabase[j].seatCol,&flightDatabase[j].seatAvailability);
+		for(int k=0;k<flightDatabase[j].seatRow;k++)
+		{
+			for(int l=0;l<flightDatabase[j].seatCol;l++)
+			{
+				fread(&flightDatabase[j].seatAvailability[k][l],sizeof(int),1,flight);	
+			}
+		}
 	}
-	printf("%d",flightDatabase[0].seatRow);
 	
-//	printf("%d",flightDatabase[0].seatAvailability[0][0]);
 
-//	if(totalOperatingFlights==0)
-//	{
-//		printf("No Available Data for Operating Flights.");
-//	}
-//	else
-//	{
-//		printf("OPERATING FLIGHTS\n");
-//		for(int i=0;i<totalOperatingFlights-1;i++)
-//		{
-//			printf("%d.\nAircraft: %sAirlines: %s\n",i+1,flightDatabase[i].name,flightDatabase[i].airline);
-//		}
-//		int flightChoice;
-//		printf("Check Available Seats of: ");
-//		scanf("%d", &flightChoice);
-//		flightChoice=flightChoice-1;
-//		system("cls");
-//		printf("Flight Details\n");
-//		printf("Aircraft: %s",flightDatabase[flightChoice].name);
-//		printf("Airlines: %s",flightDatabase[flightChoice].airline);
-//		printf("Departure: %s",flightDatabase[flightChoice].departure);
-//		printf("Destination: %s",flightDatabase[flightChoice].destination);
-//		printf("Flight Duration: %d hrs %d min %d sec\n",flightDatabase[flightChoice].flightDuration.hour,flightDatabase[flightChoice].flightDuration.minute,flightDatabase[flightChoice].flightDuration.sec);
-//		printf("Departure Time (dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[flightChoice].departureTime.day,flightDatabase[flightChoice].departureTime.month,flightDatabase[flightChoice].departureTime.year,flightDatabase[flightChoice].departureTime.hour,flightDatabase[flightChoice].departureTime.minute,flightDatabase[flightChoice].departureTime.sec);
-//		printf("Arrival Time(dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[flightChoice].arrivalTime.day,flightDatabase[flightChoice].arrivalTime.month,flightDatabase[flightChoice].arrivalTime.year,flightDatabase[flightChoice].arrivalTime.hour,flightDatabase[flightChoice].arrivalTime.minute,flightDatabase[flightChoice].arrivalTime.sec);
-//		printf("Ticket Price: %.2f\n",flightDatabase[flightChoice].ticketPrice);
-//		printf("\nSeats\n");
-//
-//		rewind(flight);
-////		printf("%s",detail.name);
-//
-//		free(craftDatabase);
-//		free(flightDatabase);
-//		fclose(craftList);
-//		fclose(flight);
-//	}
+	if(totalOperatingFlights==0)
+	{
+		printf("No Available Data for Operating Flights.");
+	}
+	else
+	{
+		printf("OPERATING FLIGHTS\n");
+		for(int i=0;i<totalOperatingFlights;i++)
+		{
+			printf("%d.\nAircraft: %sAirlines: %s\n",i+1,flightDatabase[i].name,flightDatabase[i].airline);
+		}
+		int flightChoice;
+		printf("Check Available Seats of: ");
+		scanf("%d", &flightChoice);
+		flightChoice=flightChoice-1;
+		system("cls");
+		printf("Flight Details\n");
+		printf("Aircraft: %s",flightDatabase[flightChoice].name);
+		printf("Airlines: %s",flightDatabase[flightChoice].airline);
+		printf("Departure: %s",flightDatabase[flightChoice].departure);
+		printf("Destination: %s",flightDatabase[flightChoice].destination);
+		printf("Flight Duration: %d hrs %d min %d sec\n",flightDatabase[flightChoice].flightDuration.hour,flightDatabase[flightChoice].flightDuration.minute,flightDatabase[flightChoice].flightDuration.sec);
+		printf("Departure Time (dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[flightChoice].departureTime.day,flightDatabase[flightChoice].departureTime.month,flightDatabase[flightChoice].departureTime.year,flightDatabase[flightChoice].departureTime.hour,flightDatabase[flightChoice].departureTime.minute,flightDatabase[flightChoice].departureTime.sec);
+		printf("Arrival Time(dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[flightChoice].arrivalTime.day,flightDatabase[flightChoice].arrivalTime.month,flightDatabase[flightChoice].arrivalTime.year,flightDatabase[flightChoice].arrivalTime.hour,flightDatabase[flightChoice].arrivalTime.minute,flightDatabase[flightChoice].arrivalTime.sec);
+		printf("Ticket Price: %.2f\n",flightDatabase[flightChoice].ticketPrice);
+		printf("\nSeats\n");
+
+		rewind(flight);
+
+		free(flightDatabase);
+		fclose(flight);
+	}
 	fflush(stdin);
 	getc(stdin);
 }
@@ -187,25 +177,23 @@ void addFlight()
 			if(craftDatabase[i].flightAvailability==1)
 			{
 				craftDatabase[i].flightAvailability=0;
-				initialiseSeats(details.seatRow, details.seatCol, &info.seatAvailability);
-				info.seatAvailability[0][0]=101010;
 				strcpy(info.name,craftDatabase[i].name);
 				strcpy(info.airline,craftDatabase[i].airline);
-				info.seatRow=craftDatabase[i].seatRow;
-				info.seatCol=craftDatabase[i].seatCol;				
+				info.seatRow=details.seatRow;
+				info.seatCol=details.seatCol;				
+				initialiseSeats(details.seatRow, details.seatCol, &info.seatAvailability);
 				fflush(stdin);
 				insertFlightDetails(&info);
 				fclose(flight);
 				flight=fopen("operatingFlight.txt","ab+");
-//				fwrite(&info,sizeof(flightDetails)-sizeof(info.seatAvailability),1,flight);
-//				for(int j=0; j<details.seatRow;j++)
-//				{
-//					for(int k=0;k<details.seatCol;k++)
-//					{
-//						fwrite(&info.seatAvailability[j][k],sizeof(int),1,flight);
-//					}
-//				}
-				fwrite(&info,sizeof(flightDetails),1,flight);
+				fwrite(&info,sizeof(flightDetails)-sizeof(int **),1,flight);
+				for(int j=0;j<details.seatRow;j++)
+				{
+					for(int k=0;k<details.seatCol;k++)
+					{
+						fwrite(&info.seatAvailability[j][k],sizeof(int),1,flight);	
+					}
+				}
 				fclose(craftList);
 				craftList=fopen("aircraftList.txt","wb");
 				for(int i=0;i<c_newSize-1;i++)
@@ -221,40 +209,63 @@ void addFlight()
 			else
 			{
 				system("cls");
-				int f_no=1, f_readLoop=0, f_newSize=1; //variable for reading data from flight details database
 				rewind(flight);
-				flightDatabase=(flightDetails *)calloc(f_no,sizeof(flightDetails));
-				while(fread((flightDatabase+f_readLoop), sizeof(flightDetails),1,flight)==1)
+				flightDetails counter;
+				int totalOperatingFlights=0;
+				while(fread(&counter,sizeof(flightDetails),1,flight)==1)
 				{
-					f_newSize++;
-					flightDatabase=(flightDetails *)realloc(flightDatabase, (f_newSize)*sizeof(flightDetails));
-					f_readLoop++;
+					totalOperatingFlights++;
+				}
+				rewind(flight);
+				flightDatabase=(flightDetails *)malloc(totalOperatingFlights*sizeof(flightDetails));
+				for(int l=0;l<totalOperatingFlights;l++)
+				{
+					fread((flightDatabase+l),sizeof(flightDetails)-sizeof(int **),1,flight);
+					initialiseSeats(flightDatabase[l].seatRow,flightDatabase[l].seatCol,&flightDatabase[l].seatAvailability);
+					for(int m=0;m<flightDatabase[l].seatRow;m++)
+					{
+						for(int n=0;n<flightDatabase[l].seatCol;n++)
+						{
+							fread(&flightDatabase[l].seatAvailability[m][n],sizeof(int),1,flight);	
+						}
+					}
 				}
 				printf("Flight Scheduled\nFlight Details:\n");
-				for(int j=0;j<f_newSize-1;j++)
+				for(int j=0;j<totalOperatingFlights;j++)
 				{
 					if(strcmp(details.name,flightDatabase[j].name)==0&&strcmp(details.airline,flightDatabase[j].airline)==0)
 					{
 						printf("Aircraft: %s",flightDatabase[j].name);
-						printf("Airlines: %s",flightDatabase[j].airline);
+						printf("Airline: %s",flightDatabase[j].airline);
 						printf("Departure: %s",flightDatabase[j].departure);
 						printf("Destination: %s",flightDatabase[j].destination);
 						printf("Flight Duration: %d hrs %d min %d sec\n",flightDatabase[j].flightDuration.hour,flightDatabase[j].flightDuration.minute,flightDatabase[j].flightDuration.sec);
 						printf("Departure Time (dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[j].departureTime.day,flightDatabase[j].departureTime.month,flightDatabase[j].departureTime.year,flightDatabase[j].departureTime.hour,flightDatabase[j].departureTime.minute,flightDatabase[j].departureTime.sec);
 						printf("Arrival Time(dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[j].arrivalTime.day,flightDatabase[j].arrivalTime.month,flightDatabase[j].arrivalTime.year,flightDatabase[j].arrivalTime.hour,flightDatabase[j].arrivalTime.minute,flightDatabase[j].arrivalTime.sec);
 						printf("Ticket Price: %.2f\n",flightDatabase[j].ticketPrice);
-						printf("Edit?(y/n)");
+						printf("Edit?(y/n): ");
 						if(getc(stdin)=='y')
 						{
 							insertFlightDetails(&info);
 							strcpy(info.name,flightDatabase[j].name);   
 							strcpy(info.airline,flightDatabase[j].airline);
+							info.seatRow=flightDatabase[j].seatRow;
+							info.seatCol=flightDatabase[j].seatCol;
+							int **seatAvailabilityTemp=flightDatabase[j].seatAvailability;
 							flightDatabase[j]=info;
+							flightDatabase[j].seatAvailability=seatAvailabilityTemp;
 							fclose(flight);
 							flight=fopen("operatingFlight.txt","wb");
-							for(int k=0;k<f_newSize-1;k++)
+							for(int k=0;k<totalOperatingFlights;k++)
 							{		
-								fwrite((flightDatabase+k),sizeof(flightDetails),1,flight);
+								fwrite((flightDatabase+k),sizeof(flightDetails)-sizeof(int **),1,flight);
+								for(int l=0;l<flightDatabase[k].seatRow;l++)
+								{
+									for(int m=0;m<flightDatabase[k].seatCol;m++)
+									{
+										fwrite(&flightDatabase[k].seatAvailability[l][m],sizeof(int),1,flight);
+									}
+								}
 							}
 							fclose(flight);
 						}
@@ -351,7 +362,7 @@ void insertFlightDetails(flightDetails* info)
 		info->arrivalTime.year=info->arrivalTime.year+(info->arrivalTime.month/12);
 		info->arrivalTime.month=info->arrivalTime.month%12;
 	}
-	printf("Ticke Price(Rs.): ");
+	printf("Ticket Price(Rs.): ");
 	scanf("%f",&info->ticketPrice);
 	fflush(stdin);
 }
