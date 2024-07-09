@@ -235,6 +235,7 @@ void addFlight()
 				fclose(flight);	
 				printf("Press Enter to Continue");
 				getc(stdin);		
+				break;
 			}
 				
 			else
@@ -243,8 +244,20 @@ void addFlight()
 				rewind(flight);
 				flightDetails counter;
 				int totalOperatingFlights=0;
-				while(fread(&counter,sizeof(flightDetails),1,flight)==1)
+				for(int j=0;j<c_readLoop;j++)
 				{
+					if(fread(&counter,sizeof(flightDetails)-sizeof(int **),1,flight)!=1)
+					{
+						break;
+					}
+					initialiseSeats(counter.seatRow,counter.seatCol,&counter.seatAvailability);
+					for(int l=0;l<counter.seatRow;l++)
+					{
+						for(int m=0;m<counter.seatCol;m++)
+						{
+							fread(&counter.seatAvailability[l][m],sizeof(int),1,flight);
+						}
+					}
 					totalOperatingFlights++;
 				}
 				rewind(flight);
@@ -302,6 +315,10 @@ void addFlight()
 					}	
 				}
 				getc(stdin);
+				for(int j=0;j<counter.seatRow;j++)
+				{
+					free(counter.seatAvailability[j]);
+				}
 				for(int l=0;l<totalOperatingFlights;l++)
 				{
 					for(int m=0;m<flightDatabase[l].seatRow;m++)
@@ -321,8 +338,13 @@ void addFlight()
 		goto craftErr;
 	}
 	
-	free(craftDatabase);
-	free(flightDatabase);
+	if(craftDatabase != NULL)
+	{
+		free(craftDatabase);
+	}
+    if (flightDatabase != NULL) {
+        free(flightDatabase);
+    }
 	fclose(flight);
 	fclose(craftList);
 }
@@ -504,6 +526,7 @@ void addAirplane()
 	}
 	fwrite(&details,sizeof(airplane),1,plane);
 	leave:
+	free(craftDatabase);
 	fclose(plane);
 }
 

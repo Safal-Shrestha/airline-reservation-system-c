@@ -39,6 +39,14 @@ typedef struct{
 	int **seatAvailability;
 }flightDetails;
 
+typedef struct{
+	char name[40];
+	char u_name[40];
+	char aircraft[100];
+	char airline[100];
+	int bookedSeat[2];
+}seatBooking;
+
 
 void initialiseSeats(int seatRow, int seatCol, int ***seatAvailability)
 {
