@@ -42,6 +42,7 @@ int main()
 		
 		case 3:
 			cancelFlight(currentUser);
+			goto menuErr;
 			break;
 			
 		case 4:
@@ -210,10 +211,212 @@ void bookFlight(userDetails currentUser)
 
 void bookedFlight(userDetails currentUser)
 {
+	flightDetails counter, *flightDatabase;
+	seatBooking *bookedSeatsDatabase;
+	
+	FILE *flight, *bookedSeats;
+	flight=fopen("operatingFlight.txt","rb");
+	bookedSeats=fopen("bookedSeats.txt","ab+");
+	rewind(flight);
+	rewind(bookedSeats);
+	int no=1, readLoop=0, newSize=1; //variable for reading data from booked flights details database
+	bookedSeatsDatabase=(seatBooking *)calloc(no,sizeof(seatBooking));
+	while(fread((bookedSeatsDatabase+readLoop), sizeof(seatBooking),1,bookedSeats)==1)
+	{
+		newSize++;
+		bookedSeatsDatabase=(seatBooking *)realloc(bookedSeatsDatabase, (newSize)*sizeof(seatBooking));
+		readLoop++;
+	}
+	
+	int totalOperatingFlights=0; //reading data from operating flights
+	for(int j=0;j>=0;j++)
+	{
+		if(fread(&counter,sizeof(flightDetails)-sizeof(int **),1,flight)!=1)
+		{
+			break;
+		}
+		initialiseSeats(counter.seatRow,counter.seatCol,&counter.seatAvailability);
+		for(int l=0;l<counter.seatRow;l++)
+		{
+			for(int m=0;m<counter.seatCol;m++)
+			{
+				fread(&counter.seatAvailability[l][m],sizeof(int),1,flight);
+			}
+		}
+		totalOperatingFlights++;
+	}
+	rewind(flight);
+	flightDatabase=(flightDetails *)malloc(totalOperatingFlights*sizeof(flightDetails));
+	for(int j=0;j<totalOperatingFlights;j++)
+	{
+		fread((flightDatabase+j),sizeof(flightDetails)-sizeof(int **),1,flight);
+		initialiseSeats(flightDatabase[j].seatRow,flightDatabase[j].seatCol,&flightDatabase[j].seatAvailability);
+		for(int k=0;k<flightDatabase[j].seatRow;k++)
+		{
+			for(int l=0;l<flightDatabase[j].seatCol;l++)
+			{
+				fread(&flightDatabase[j].seatAvailability[k][l],sizeof(int),1,flight);	
+			}
+		}
+	}
+	int num=1;
+	for(int i=0;i<readLoop;i++)
+	{
+		if(strcmp(currentUser.name,bookedSeatsDatabase[i].name)==0&&strcmp(currentUser.uName,bookedSeatsDatabase[i].u_name)==0)
+		{
+			for(int j=0;j<totalOperatingFlights;j++)
+			{
+				if(strcmp(flightDatabase[j].name,bookedSeatsDatabase[i].aircraft)==0&&strcmp(flightDatabase[j].airline,bookedSeatsDatabase[i].airline)==0)
+				{
+					printf("%d.\nAirCraft: %sAirline: %s",num,bookedSeatsDatabase[i].aircraft,bookedSeatsDatabase[i].airline);
+					printf("Flight Duration: %d hrs %d min %d sec\n",flightDatabase[j].flightDuration.hour,flightDatabase[j].flightDuration.minute,flightDatabase[j].flightDuration.sec);
+					printf("Departure Time (dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[j].departureTime.day,flightDatabase[j].departureTime.month,flightDatabase[j].departureTime.year,flightDatabase[j].departureTime.hour,flightDatabase[j].departureTime.minute,flightDatabase[j].departureTime.sec);
+					printf("Arrival Time(dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[j].arrivalTime.day,flightDatabase[j].arrivalTime.month,flightDatabase[j].arrivalTime.year,flightDatabase[j].arrivalTime.hour,flightDatabase[j].arrivalTime.minute,flightDatabase[j].arrivalTime.sec);
+					printf("Seat Row: %d\nSeat Column: %d\n\n",bookedSeatsDatabase[i].bookedSeat[0],bookedSeatsDatabase[i].bookedSeat[1]);
+					num++;
+				}
+			}
+		}
+	}
+	free(bookedSeatsDatabase);
+	for(int i=0;i<readLoop;i++)
+	{
+		for(int j=0;j<flightDatabase[i].seatRow;j++)
+		{
+			free(flightDatabase[i].seatAvailability[j]);
+		}
+		free(flightDatabase[i].seatAvailability);
+	}
+	free(flightDatabase);
+	fclose(flight);
+	fclose(bookedSeats);
+	fflush(stdin);
 	getc(stdin);
 }
 
 void cancelFlight(userDetails currentUser)
 {
+	flightDetails counter, *flightDatabase;
+	seatBooking *bookedSeatsDatabase;
+	
+	FILE *flight, *bookedSeats;
+	flight=fopen("operatingFlight.txt","rb");
+	bookedSeats=fopen("bookedSeats.txt","ab+");
+	rewind(flight);
+	rewind(bookedSeats);
+	int no=1, readLoop=0, newSize=1; //variable for reading data from booked flights details database
+	bookedSeatsDatabase=(seatBooking *)calloc(no,sizeof(seatBooking));
+	while(fread((bookedSeatsDatabase+readLoop), sizeof(seatBooking),1,bookedSeats)==1)
+	{
+		newSize++;
+		bookedSeatsDatabase=(seatBooking *)realloc(bookedSeatsDatabase, (newSize)*sizeof(seatBooking));
+		readLoop++;
+	}
+	
+	int totalOperatingFlights=0; //reading data from operating flights
+	for(int j=0;j>=0;j++)
+	{
+		if(fread(&counter,sizeof(flightDetails)-sizeof(int **),1,flight)!=1)
+		{
+			break;
+		}
+		initialiseSeats(counter.seatRow,counter.seatCol,&counter.seatAvailability);
+		for(int l=0;l<counter.seatRow;l++)
+		{
+			for(int m=0;m<counter.seatCol;m++)
+			{
+				fread(&counter.seatAvailability[l][m],sizeof(int),1,flight);
+			}
+		}
+		totalOperatingFlights++;
+	}
+	rewind(flight);
+	flightDatabase=(flightDetails *)malloc(totalOperatingFlights*sizeof(flightDetails));
+	for(int j=0;j<totalOperatingFlights;j++)
+	{
+		fread((flightDatabase+j),sizeof(flightDetails)-sizeof(int **),1,flight);
+		initialiseSeats(flightDatabase[j].seatRow,flightDatabase[j].seatCol,&flightDatabase[j].seatAvailability);
+		for(int k=0;k<flightDatabase[j].seatRow;k++)
+		{
+			for(int l=0;l<flightDatabase[j].seatCol;l++)
+			{
+				fread(&flightDatabase[j].seatAvailability[k][l],sizeof(int),1,flight);	
+			}
+		}
+	}
+	int num=1;
+	for(int i=0;i<readLoop;i++)
+	{
+		if(strcmp(currentUser.name,bookedSeatsDatabase[i].name)==0&&strcmp(currentUser.uName,bookedSeatsDatabase[i].u_name)==0)
+		{
+			for(int j=0;j<totalOperatingFlights;j++)
+			{
+				if(strcmp(flightDatabase[j].name,bookedSeatsDatabase[i].aircraft)==0&&strcmp(flightDatabase[j].airline,bookedSeatsDatabase[i].airline)==0)
+				{
+					printf("%d.\nAirCraft: %sAirline: %s",num,bookedSeatsDatabase[i].aircraft,bookedSeatsDatabase[i].airline);
+					printf("Flight Duration: %d hrs %d min %d sec\n",flightDatabase[j].flightDuration.hour,flightDatabase[j].flightDuration.minute,flightDatabase[j].flightDuration.sec);
+					printf("Departure Time (dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[j].departureTime.day,flightDatabase[j].departureTime.month,flightDatabase[j].departureTime.year,flightDatabase[j].departureTime.hour,flightDatabase[j].departureTime.minute,flightDatabase[j].departureTime.sec);
+					printf("Arrival Time(dd/mm/yyyy h:m:s): %d/%d/%d %d:%d:%d\n",flightDatabase[j].arrivalTime.day,flightDatabase[j].arrivalTime.month,flightDatabase[j].arrivalTime.year,flightDatabase[j].arrivalTime.hour,flightDatabase[j].arrivalTime.minute,flightDatabase[j].arrivalTime.sec);
+					printf("Seat Row: %d\nSeat Column: %d\n\n",bookedSeatsDatabase[i].bookedSeat[0],bookedSeatsDatabase[i].bookedSeat[1]);
+					num++;
+				}
+			}
+		}
+	}
+	int ticketChoice;
+	fflush(stdin);
+	printf("Cancel Seat of: ");
+	scanf("%d",&ticketChoice);
+	ticketChoice=ticketChoice-1;
+	printf("Confirm Deletion?(y/n): ");
+	fflush(stdin);
+	if(getc(stdin)=='y')
+	{
+		printf(GRN "Cancellation Successfull!" reset);
+		fclose(bookedSeats);
+		fclose(flight);
+		flight=fopen("operatingFlight.txt","wb");
+		bookedSeats=fopen("bookedSeats.txt","wb");
+		for(int i=0;i<totalOperatingFlights;i++)
+		{
+			if(strcmp(flightDatabase[i].airline,bookedSeatsDatabase[ticketChoice].airline)==0&&strcmp(flightDatabase[i].name,bookedSeatsDatabase[ticketChoice].aircraft)==0)
+			{
+				flightDatabase[i].seatAvailability[bookedSeatsDatabase[ticketChoice].bookedSeat[0]][bookedSeatsDatabase[ticketChoice].bookedSeat[1]]=0;
+			}
+		}
+		for(int k=0;k<totalOperatingFlights;k++)
+		{		
+			fwrite((flightDatabase+k),sizeof(flightDetails)-sizeof(int **),1,flight);
+			for(int l=0;l<flightDatabase[k].seatRow;l++)
+			{
+				for(int m=0;m<flightDatabase[k].seatCol;m++)
+				{
+					fwrite(&flightDatabase[k].seatAvailability[l][m],sizeof(int),1,flight);
+				}
+			}
+		}
+		for(int i=0;i<readLoop;i++)
+		{
+			if(i==ticketChoice-1)
+			{
+				continue;
+			}
+			fwrite(&bookedSeatsDatabase[i],sizeof(seatBooking),1,bookedSeats);
+		}
+	}
+	
+	free(bookedSeatsDatabase);
+	for(int i=0;i<readLoop;i++)
+	{
+		for(int j=0;j<flightDatabase[i].seatRow;j++)
+		{
+			free(flightDatabase[i].seatAvailability[j]);
+		}
+		free(flightDatabase[i].seatAvailability);
+	}
+	free(flightDatabase);
+	fclose(flight);
+	fclose(bookedSeats);
+	fflush(stdin);
 	getc(stdin);
 }
