@@ -314,19 +314,19 @@ void addFlight()
 						}
 					}	
 				}
-				getc(stdin);
-				for(int j=0;j<counter.seatRow;j++)
+			}
+			getc(stdin);
+			for(int j=0;j<counter.seatRow;j++)
+			{
+				free(counter.seatAvailability[j]);
+			}
+			for(int l=0;l<totalOperatingFlights;l++)
+			{
+				for(int m=0;m<flightDatabase[l].seatRow;m++)
 				{
-					free(counter.seatAvailability[j]);
+					free(flightDatabase[l].seatAvailability[m]);
 				}
-				for(int l=0;l<totalOperatingFlights;l++)
-				{
-					for(int m=0;m<flightDatabase[l].seatRow;m++)
-					{
-						free(flightDatabase[l].seatAvailability[m]);
-					}
-					free(flightDatabase[l].seatAvailability);
-				}
+				free(flightDatabase[l].seatAvailability);
 			}
 		}
 	}
