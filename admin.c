@@ -314,7 +314,6 @@ void addFlight()
 						}
 					}	
 				}
-				getc(stdin);
 				for(int j=0;j<counter.seatRow;j++)
 				{
 					free(counter.seatAvailability[j]);
@@ -327,6 +326,7 @@ void addFlight()
 					}
 					free(flightDatabase[l].seatAvailability);
 				}
+				free(flightDatabase);
 				printf("\nFlight Updated");
 				getc(stdin);
 			}
@@ -344,9 +344,6 @@ void addFlight()
 	{
 		free(craftDatabase);
 	}
-    if(flightDatabase != NULL) {
-        free(flightDatabase);
-    }
     if(flight != NULL)
     {	
 		fclose(flight);
