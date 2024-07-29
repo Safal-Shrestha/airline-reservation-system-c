@@ -314,19 +314,21 @@ void addFlight()
 						}
 					}	
 				}
-			}
-			getc(stdin);
-			for(int j=0;j<counter.seatRow;j++)
-			{
-				free(counter.seatAvailability[j]);
-			}
-			for(int l=0;l<totalOperatingFlights;l++)
-			{
-				for(int m=0;m<flightDatabase[l].seatRow;m++)
+				getc(stdin);
+				for(int j=0;j<counter.seatRow;j++)
 				{
-					free(flightDatabase[l].seatAvailability[m]);
+					free(counter.seatAvailability[j]);
 				}
-				free(flightDatabase[l].seatAvailability);
+				for(int l=0;l<totalOperatingFlights;l++)
+				{
+					for(int m=0;m<flightDatabase[l].seatRow;m++)
+					{
+						free(flightDatabase[l].seatAvailability[m]);
+					}
+					free(flightDatabase[l].seatAvailability);
+				}
+				printf("\nFlight Updated");
+				getc(stdin);
 			}
 		}
 	}
@@ -342,11 +344,17 @@ void addFlight()
 	{
 		free(craftDatabase);
 	}
-    if (flightDatabase != NULL) {
+    if(flightDatabase != NULL) {
         free(flightDatabase);
     }
-	fclose(flight);
-	fclose(craftList);
+    if(flight != NULL)
+    {	
+		fclose(flight);
+	}
+	if(craftList!=NULL)
+	{
+		fclose(craftList);
+	}
 }
 
 void deleteFlight()
