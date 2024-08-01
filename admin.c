@@ -28,7 +28,7 @@ int main()
 	menuErr:
 	system("cls");
 	printf("Menu\n");
-	printf("1. Check Flight Details\n2. Add/Edit Flight\n3. Delete Flight\n4. Add Airplane\n5. Delete Airplane\n6. Logout");
+	printf("1. Check Flight Details\n2. Add/Edit Flight\n3. Depart Flight\n4. Add Airplane\n5. Delete Airplane\n6. Logout");
 	printf("\nEnter Choice: ");
 	scanf("%d",&choice);
 	fflush(stdin);
